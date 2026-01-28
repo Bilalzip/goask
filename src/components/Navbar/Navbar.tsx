@@ -20,6 +20,7 @@ const menu = [
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
 
   const isAuth = useSelector((state: RootState) => state.user.isAuthenticated);
@@ -34,6 +35,7 @@ const Navbar = () => {
 
   useEffect(() => {
     setIsMenuOpen(false);
+    setMounted(true);
   }, []);
 
   return (
@@ -60,7 +62,9 @@ const Navbar = () => {
         ))}
       </div>
       <div className="hidden md:flex">
-        {isAuth ? (
+        {!mounted ? (
+          <div className="w-24 h-10" />
+        ) : isAuth ? (
           <div>
             <button
               onClick={handelLogout}
@@ -79,12 +83,6 @@ const Navbar = () => {
             </Links>
           </div>
         )}
-        {/* <Links
-          href={"/sign-up"}
-          className="px-4 py-2 bg-yellow-400 text-black rounded-md font-bold"
-        >
-          Sign Up
-        </Links> */}
       </div>
       <div className="md:hidden flex items-center">
         <button
@@ -94,7 +92,7 @@ const Navbar = () => {
           {isMenuOpen ? <MdClose size={24} /> : <CiMenuBurger size={24} />}
         </button>
       </div>
-      {isMenuOpen && (
+      {mounted && isMenuOpen && (
         <div className="absolute top-16 left-0 w-full bg-black flex flex-col items-center z-10">
           {menu.map((item) => (
             <Link

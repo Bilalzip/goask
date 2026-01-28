@@ -13,13 +13,11 @@ type TokenType = {
 export async function POST(req: NextRequest, res: NextResponse) {
   const reqBody = await req.json();
   const { email, password } = reqBody;
-  console.log(reqBody);
 
   const user = (await db
     .select()
     .from(users)
     .where(eq(users.email, email))) as any;
-  console.log("user", user);
 
   if (user.length === 0) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });

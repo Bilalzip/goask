@@ -1,4 +1,4 @@
-import { FaInstagram, FaWindows, FaLinkedin, FaYoutube } from "react-icons/fa";
+import { FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
 import Logo from "@/assets/logo.png";
 import Image from "next/image";
 
@@ -18,7 +18,7 @@ const Footer = () => {
               />
             </div>
             <address className="not-italic mb-4">
-              <p>Level 1, 12 Sample St, Sydney NSW 2000</p>
+              <p>960 William Street, Thunder Bay, Ontario</p>
             </address>
             <div className="mb-4">
               <p>Contact</p>
@@ -28,49 +28,32 @@ const Footer = () => {
             </div>
             <div className="flex space-x-6 mb-6">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/hilarious_bilal/"
                 aria-label="Instagram"
                 className="text-green-500 text-2xl"
               >
                 <FaInstagram />
               </a>
-              <a
-                href="https://windows.com"
-                aria-label="Windows"
-                className="text-green-500 text-2xl"
-              >
-                <FaWindows />
-              </a>
-              <a
-                href="https://linkedin.com"
+                            <a
+                href="https://www.linkedin.com/in/mohd-bilal-b9a0b71a8/"
                 aria-label="LinkedIn"
                 className="text-green-500 text-2xl"
               >
                 <FaLinkedin />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@Codewithbilal123"
                 aria-label="YouTube"
                 className="text-green-500 text-2xl"
               >
                 <FaYoutube />
               </a>
             </div>
-            <div className="text-center text-gray-500 mb-4">
-              <p>© 2024 Pdt. All rights reserved.</p>
-            </div>
+            <div className="text-center text-gray-400 mb-4">
+  <p>Built with <span className="text-red-500">{'\u2764'}</span> by <a href="https://www.cloudbybilal.com/" className="text-yellow-400 hover:underline">Cloud By Bilal</a></p>
+</div>
           </div>
-          <div className="flex space-x-6 text-gray-500 items-end">
-            <a href="/privacy-policy" className="hover:text-green-500">
-              Privacy Policy
-            </a>
-            <a href="/terms-of-service" className="hover:text-green-500">
-              Terms of Service
-            </a>
-            <a href="/cookies-settings" className="hover:text-green-500">
-              Cookies Settings
-            </a>
-          </div>
+          
         </div>
       </div>
     </footer>
@@ -78,3 +61,6 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
+

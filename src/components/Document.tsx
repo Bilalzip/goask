@@ -42,7 +42,7 @@ const DocumentItem = ({
   onEditSubmit?: () => void;
   onEditCancel?: () => void;
 }) => (
-  <div className={`group w-full flex items-center justify-between gap-3 p-3 hover:bg-[#000B26] rounded-lg ${isActive ? 'bg-[#000B26]' : ''}`}>
+  <div className={`group w-full flex items-center justify-between gap-3 p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition ${isActive ? 'ring-2 ring-yellow-400/40' : ''}`}>
     <div className="flex-1 flex flex-row gap-3 items-center">
       <button onClick={onClick} className="shrink-0">
         <div className="bg-white/90 rounded-full flex justify-center items-center w-10 h-10 text-black font-semibold">
@@ -118,7 +118,7 @@ const DocumentList = ({ showdoc, setshowdoc, Chats, activeChatId, onChatsChange 
           </button>
         </div>
         {/* Set a fixed height and enable overflow-y */}
-        <div className="mt-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-track-gray-300 scrollbar-thumb-gray-600"
+        <div className="mt-4 flex flex-col gap-2 overflow-y-auto scrollbar-thin scrollbar-track-gray-300 scrollbar-thumb-gray-600"
              style={{ scrollbarColor: '#101010 #E7C200C7', scrollbarWidth: 'thin' }}>
           {Chats.map((chat) => (
             <DocumentItem

@@ -26,13 +26,10 @@ type PDFPage = {
 
 export async function loadS3IntoPinecone(fileKey: string) {
   // 1. obtain the pdf -> downlaod and read from pdf
-  console.log("downloading s3 into file system");
   const file_name = await downloadFromS3(fileKey);
-  console.log(file_name);
   if (!file_name) {
     throw new Error("could not download from s3");
   }
-  console.log("loading pdf into memory" + file_name);
   const loader = new PDFLoader(file_name);
   const pages = (await loader.load()) as PDFPage[];
 
@@ -44,7 +41,6 @@ export async function loadS3IntoPinecone(fileKey: string) {
   const index = pc.index('goaskpdf');
   const namespace = index.namespace(convertToAscii(fileKey));
 
-  console.log("inserting vectors into pinecone");
   await namespace.upsert(vectors);
 
   return documents[0];
@@ -53,8 +49,6 @@ export async function loadS3IntoPinecone(fileKey: string) {
 async function embedDocument(doc: Document) {
   try {
     const embeddings = await getEmbeddings(doc.pageContent);
-    // console.log(embeddings)
-    console.log("embedding dimension:", embeddings.length);
 
     const hash = md5(doc.pageContent);
     return {
@@ -66,7 +60,6 @@ async function embedDocument(doc: Document) {
       },
     } as PineconeRecord;
   } catch (error) {
-    console.log("error embedding document", error);
     throw error;
   }
 }

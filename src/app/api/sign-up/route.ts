@@ -15,7 +15,6 @@ type UserCred = {
 export async function POST(req: NextRequest) {
   const body: UserCred = await req.json();
   const { email, password } = body;
-  console.log("Request body:", body);
 
   const salt = await bcryptjs.genSalt(10);
   const hashedPassword = await bcryptjs.hash(password, salt);
@@ -25,7 +24,6 @@ export async function POST(req: NextRequest) {
       .select()
       .from(users)
       .where(eq(users.email, email));
-    console.log("Existing User:", existingUser);
 
     if (existingUser.length > 0) {
       return NextResponse.json(
@@ -35,7 +33,6 @@ export async function POST(req: NextRequest) {
     }
 
     const newUserId = uuidv4();
-    console.log("Generated UUID:", newUserId);
 
     const UserToken = await db
       .insert(users)

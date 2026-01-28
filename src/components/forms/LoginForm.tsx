@@ -56,11 +56,11 @@ const LoginForm = () => {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="w-full lg:w-1/3 flex items-center justify-center bg-black p-8">
+      <div className="w-full lg:w-1/3 flex items-center justify-center bg-black p-8 text-white">
         <div className="w-full max-w-sm">
           <div className="flex items-center justify-center mb-6">
             <Image src={logo} alt="Logo" className="h-12 w-12 mr-2" />
-            <span className="text-2xl font-bold">GoAskPDF</span>
+            <span className="text-2xl font-bold text-yellow-300">GoAskPDF</span>
           </div>
           {/* <h3 className="text-lg text-center mb-6">Nice to meet you</h3> */}
           <form className="space-y-4">
@@ -94,7 +94,7 @@ const LoginForm = () => {
                   type="checkbox"
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm ">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-white">
                   Remember me
                 </label>
               </div>

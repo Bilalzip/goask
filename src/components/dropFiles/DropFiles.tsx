@@ -45,11 +45,9 @@ const DropFiles = (props:any) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  console.log(Uid)
   const { mutate } = useMutation({
     mutationFn: async ({ file_key, file_name }:any) => {
       try {
-        console.log( { file_key, file_name , Uid });
         const response = await axios.post('/api/create-chat', { file_key, file_name , Uid });
         router.push(`/chat/${response.data.chat_id}`);
       } catch (error) {

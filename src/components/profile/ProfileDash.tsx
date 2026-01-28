@@ -28,7 +28,6 @@ const ProfileDash = () => {
   useEffect(() => {
     const e = localStorage.getItem('email');
     const u = localStorage.getItem('Uid');
-    console.log('[ProfileDash] initial localStorage', { email: e, Uid: u });
     setEmail(e);
     setUid(u);
   }, []);
@@ -38,7 +37,6 @@ const ProfileDash = () => {
       if (!uid) return;
       try {
         const res = await axios.post('/api/user/chats', { Uid: uid });
-        console.log('[ProfileDash] loaded chats', res.data);
         setDocs(res.data?.chats || []);
       } catch (e) {
         console.error('Failed to load documents', e);
@@ -48,7 +46,6 @@ const ProfileDash = () => {
       try {
         if (!uid) return;
         const res = await axios.get(`/api/profile?Uid=${uid}`);
-        console.log('[ProfileDash] loaded profile', res.data);
         const p = res.data?.profile;
         if (p) {
           setFullName(p.fullName || "");
