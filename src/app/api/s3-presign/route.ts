@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     console.log("command", command)
 
-    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+    const uploadUrl = await getSignedUrl(s3 as any, command as any, { expiresIn: 60 * 5 });
     return NextResponse.json({ uploadUrl, file_key, file_name: sanitized });
   } catch (err) {
     console.error("Presign error:", err);

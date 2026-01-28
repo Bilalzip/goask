@@ -12,7 +12,7 @@ type Props = {
   };
 };
 
-type ChatItem = { id: number; pdfName: string; pdfUrl: string; fileKey: string };
+type ChatItem = { id: number; pdfName: string };
 
 const ChatLayout = ({ params: { chatId } }: Props) => {
   const [showDoc, setShowDoc] = useState(false);
@@ -30,7 +30,7 @@ const ChatLayout = ({ params: { chatId } }: Props) => {
       if (!uid) return;
       try {
         const res = await axios.post("/api/chats", { Uid: uid, ChatId: chatId });
-        const list: ChatItem[] = res.data.chats || [];
+        const list: ChatItem[] = (res.data.chats || []).map((c: any) => ({ id: c.id, pdfName: c.pdfName }));
         if (!list.length || !res.data.currentChat) {
           router.push('/');
           return;

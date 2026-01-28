@@ -120,12 +120,14 @@ const MessageList = ({ messages, isLoading, isError, errorMessage, isThinking }:
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
               components={{
-                code({ inline, className, children, ...props }) {
-                  if (inline) return <code className="px-1 py-0.5 rounded bg-black/30" {...props}>{children}</code>;
+                code: (props: any) => {
+                  const { inline, className, children, ...rest } = props || {};
+                  if (inline) return <code className="px-1 py-0.5 rounded bg-black/30" {...rest}>{children}</code>;
                   return <CodeBlock className={className}>{children}</CodeBlock>;
                 },
-                a({ children, href, ...props }) {
-                  return <a className="underline" href={href} target="_blank" rel="noreferrer" {...props}>{children}</a>;
+                a: (props: any) => {
+                  const { children, href, ...rest } = props || {};
+                  return <a className="underline" href={href} target="_blank" rel="noreferrer" {...rest}>{children}</a>;
                 },
               }}
             >
