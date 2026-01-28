@@ -7,9 +7,11 @@ export async function getMatchesFromEmbeddings(
   fileKey: string
 ) {
   try {
-    const client = new Pinecone({
-        apiKey: "3ebfa91c-77f7-4bd7-881b-a677175105bd"
-      });
+    const apiKey = process.env.PINECONE_API_KEY;
+    if (!apiKey) {
+      throw new Error('Missing PINECONE_API_KEY');
+    }
+    const client = new Pinecone({ apiKey });
     const pineconeIndex = await client.index("goaskpdf");
     const namespace = pineconeIndex.namespace(convertToAscii(fileKey));
     const queryResult = await namespace.query({

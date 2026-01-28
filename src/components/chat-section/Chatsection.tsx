@@ -1,25 +1,19 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { ChevronLeft, Send } from 'lucide-react';
-import Image from 'next/image';
-import UserAvatar from '@/assets/b84078f59fedb0ab8eee6f0eeb77dcc2.png';
-import AiAvatar from '@/assets/logo.png';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Message } from 'ai';
 import { useChat } from "ai/react";
-import MessageList from '../MessageList';
+import MessageList from './MessageList';
 interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
 }
 
 const ChatSection = ({showdoc , setshowdoc , chatId}:any) => {
-  const [inputText, setInputText] = useState('');
-  const router = useRouter();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: async () => {
       const response = await axios.post<Message[]>("/api/get-messages", {
@@ -28,20 +22,23 @@ const ChatSection = ({showdoc , setshowdoc , chatId}:any) => {
       return response.data;
     },
   });
-  const { input, handleInputChange, handleSubmit, messages } = useChat({
+  const [streamError, setStreamError] = useState<string | null>(null);
+  const { input, handleInputChange, handleSubmit, messages, isLoading: isStreaming } = useChat({
     api: "/api/chat",
     body: {
       chatId,
     },
     initialMessages: data || [],
+    onError: (e) => setStreamError(e?.message || 'Failed to send message'),
   });
  
 
   const handleSection =()=>{
     setshowdoc(!showdoc)
   }
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       handleSubmit();
     }
   };
@@ -64,25 +61,28 @@ const ChatSection = ({showdoc , setshowdoc , chatId}:any) => {
           scrollbarWidth: 'thin',
         }}
       >
-        <MessageList messages={messages} isLoading={isLoading} />
+        <MessageList
+          messages={messages}
+          isLoading={isLoading && messages.length === 0}
+          isError={!!streamError || isError}
+          errorMessage={streamError || (isError ? (error as any)?.message : undefined)}
+          isThinking={isStreaming}
+        />
       </div>
 
-      <div className="flex flex-row p-4 sticky bottom-0">
-        <input
-          type="text"
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 p-4 sticky bottom-0 bg-transparent">
+        <textarea
           value={input}
           onChange={handleInputChange}
-          className="flex-grow p-2 border  rounded-l-full text-black h-12 focus:border-white"
-          placeholder="Type your message..."
           onKeyDown={handleKeyDown}
+          rows={1}
+          placeholder="Ask about this document..."
+          className="flex-grow resize-none p-3 rounded-xl text-black focus:outline-none focus:ring-2 focus:ring-yellow-400"
         />
-        <button
-          onClick={handleSubmit}
-          className="text-white bg-white rounded-r-full p-3"
-        >
-          <Send color='#00C308'/>
+        <button type="submit" className="px-4 py-3 rounded-xl bg-yellow-400 text-black font-semibold hover:bg-yellow-300 transition-colors">
+          <Send size={18} />
         </button>
-      </div>
+      </form>
     </div>
   );
 };

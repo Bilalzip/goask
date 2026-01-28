@@ -28,7 +28,6 @@ const Page = () => {
           </p>
         </div>
         <DropFiles />
-        <UploadFileStatus />
       </div>
     </div>
   );

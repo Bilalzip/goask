@@ -60,3 +60,14 @@ import {
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow()
   });
+
+  // User profile (optional fields)
+  export const userProfiles = pgTable("user_profiles", {
+    userId: uuid("user_id").primaryKey(),
+    fullName: varchar("full_name", { length: 255 }),
+    location: varchar("location", { length: 255 }),
+    about: text("about"),
+    avatarKey: text("avatar_key"),
+    avatarUrl: text("avatar_url"),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  });

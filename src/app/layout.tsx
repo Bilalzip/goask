@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar/Navbar";
 import Providers from "@/components/Provider";
 import Footer from "@/components/Footer/Footer";
 import { StoreProvider } from "@/store/Provider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import Navbar from "@/components/Navbar/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,6 +29,7 @@ export default function RootLayout({
               {/* <Navbar /> */}
               {children}
               <Footer />
+              <ToastContainer position="top-right" newestOnTop theme="dark" />
             </div>
           </body>
         </html>

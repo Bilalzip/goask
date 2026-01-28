@@ -10,6 +10,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { uploadToS3 } from '@/lib/UploadFile';
 import { Loader2 } from 'lucide-react';
+import UploadFileStatus from './UploadFileStatus';
+import { toast } from 'react-toastify';
 
 
 const DropzoneContainer = styled.div`
@@ -33,14 +35,13 @@ const DropzoneContainer = styled.div`
 
 const DropFiles = (props:any) => {
     const [Uid , setUid] =  useState<any>();
+    const [progress, setProgress] = useState<number>(0);
+    const [currentName, setCurrentName] = useState<string>("");
 
-  useEffect(()=>{
-    const data = ()=>{
-      const token = localStorage.getItem('Uid');
-      setUid(token);
-    }
-    data();
-  })
+  useEffect(() => {
+    const token = localStorage.getItem('Uid');
+    setUid(token);
+  }, [])
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -59,31 +60,38 @@ const DropFiles = (props:any) => {
     },
   });
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: { 'application/pdf': ['.pdf'], 'application/msword': ['.doc', '.docx'], 'text/plain': ['.txt'] },
     maxFiles: 1,
+    multiple: false,
+    noClick: true,
     onDrop: async (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
         console.error("File too large");
+        toast.error('File too large (max 10MB).');
         return;
       }
 
       setLoading(true);
+      setProgress(0);
+      setCurrentName(file.name);
 
       try {
-        const data = await uploadToS3(file);
+        const data = await uploadToS3(file, { onProgress: (p)=> setProgress(p) });
 
 
         if (data?.file_key && data.file_name) {
           mutate(data);
         } else {
           console.error("Upload failed");
+          toast.error('Upload failed. Please try again.');
         }
       } catch (error) {
         setLoading(false);
         console.error("Error during upload:", error);
+        toast.error('Error during upload. Check console for details.');
       }
     },
   });
@@ -101,17 +109,14 @@ const DropFiles = (props:any) => {
           </div>
           <div>
             <span>Or</span>
-            <button className="relative overflow-hidden focus:outline-none bg-yellow-400 text-black font-bold py-2 px-4 rounded shadow-md flex mx-auto gap-2 mt-2">
+            <button type="button" onClick={open} className="relative overflow-hidden focus:outline-none bg-yellow-400 text-black font-bold py-2 px-4 rounded shadow-md flex mx-auto gap-2 mt-2">
               <LuUpload className="mt-1" size={17} />
               Browse Files
             </button>
           </div>
         </DropzoneContainer>
       ) : (
-        <div className="flex flex-col justify-center items-center p-8">
-          <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
-          <p className="text-xl text-black font-mono mt-2">Uploading... Please wait!</p>
-        </div>
+        <UploadFileStatus fileName={currentName} progress={progress} visible={true} />
       )}
     </div>
   );

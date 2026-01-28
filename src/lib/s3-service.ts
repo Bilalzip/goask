@@ -1,47 +1,40 @@
-import { S3 } from "@aws-sdk/client-s3";
+import { S3, GetObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
 
 export async function downloadFromS3(file_key: string): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
-      const s3 = new S3({
-        region: "ap-south-1",
-        credentials: {
-          accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_ACCESS_KEY!,
-        },
-      });
-      const params = {
-        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
-        Key: file_key,
-      };
+      const region = process.env.AWS_REGION as string;
+      const bucket = process.env.S3_BUCKET_NAME as string;
+      const accessKeyId = process.env.S3_ACCESS_KEY_ID as string;
+      const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY as string;
 
-      const obj = await s3.getObject(params);
+      const s3 = new S3({
+        region,
+        credentials: { accessKeyId, secretAccessKey },
+      });
+      const command = new GetObjectCommand({ Bucket: bucket, Key: file_key });
+      const obj = await s3.send(command);
+
       const tmpDir = '/tmp';
-      // Ensure /tmp directory exists
-      if (!fs.existsSync(tmpDir)) {
-        fs.mkdirSync(tmpDir);
-      }
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
       const file_name = path.join(tmpDir, `${Date.now().toString()}.pdf`);
 
-      if (obj.Body instanceof require("stream").Readable) {
-        // AWS-SDK v3 has some issues with their typescript definitions, but this works
-        // https://github.com/aws/aws-sdk-js-v3/issues/843
-        //open the writable stream and write the file
+      const body = obj.Body as Readable | undefined;
+      if (body) {
         const file = fs.createWriteStream(file_name);
-        file.on("open", function (fd) {
-          // @ts-ignore
-          obj.Body?.pipe(file).on("finish", () => {
-            return resolve(file_name);
-          });
+        file.on("open", function () {
+          body.pipe(file).on("finish", () => resolve(file_name));
         });
-        // obj.Body?.pipe(fs.createWriteStream(file_name));
+      } else {
+        reject(new Error('Empty S3 object body'));
       }
     } catch (error) {
       console.error(error);
       reject(error);
-      return null;
+      return null as any;
     }
   });
 }

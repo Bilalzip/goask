@@ -4,50 +4,62 @@ import UserNav from '@/components/Navbar/UserNav'
 import Chatsection from '@/components/chat-section/Chatsection'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+
 type Props = {
   params: {
     chatId: string;
   };
 };
+
+type ChatItem = { id: number; pdfName: string; pdfUrl: string; fileKey: string };
+
 const ChatLayout = ({ params: { chatId } }: Props) => {
   const [showDoc, setShowDoc] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
-  const [chats, setChats] = useState<any[]>([]);
-  const navigate = useRouter();
+  const [chats, setChats] = useState<ChatItem[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchUid = () => {
-      const token = localStorage.getItem('Uid');
-      setUid(token);
-    };
-    fetchUid();
+    const token = localStorage.getItem('Uid');
+    setUid(token);
   }, []);
 
   useEffect(() => {
     const fetchChats = async () => {
-      if (uid) {
-        try {
-          const res = await axios.post("/api/chats", { Uid: uid, ChatId: chatId });
-          if (!res.data.chats.length || !res.data.currentChat) {
-            navigate.push('/');
-          } else {
-            setChats(res.data.chats);
-          }
-        } catch (error) {
-          console.error("Error fetching chats", error);
-          navigate.push('/');
+      if (!uid) return;
+      try {
+        const res = await axios.post("/api/chats", { Uid: uid, ChatId: chatId });
+        const list: ChatItem[] = res.data.chats || [];
+        if (!list.length || !res.data.currentChat) {
+          router.push('/');
+          return;
         }
+        // Deduplicate by id to avoid repeated sessions
+        const unique = Array.from(new Map(list.map(c => [c.id, c])).values());
+        setChats(unique);
+      } catch (error) {
+        console.error("Error fetching chats", error);
+        router.push('/');
       }
     };
     fetchChats();
-  }, [chatId, uid, navigate]);
+  }, [chatId, uid, router]);
+
+  const activeId = useMemo(() => parseInt(chatId), [chatId]);
+
   return (
     <div className='flex flex-col'>
-      <UserNav showchat = {true} />
+      <UserNav showchat={true} />
       <div className='flex flex-row gap-8 max-h-dvh md:p-12 p-2'>
-        <DocumentList showdoc={showDoc}  setshowdoc={setShowDoc} Chats={chats}/>
-        <Chatsection chatId={parseInt(chatId)} showdoc = {showDoc} setshowdoc = {setShowDoc}/>
+        <DocumentList
+          showdoc={showDoc}
+          setshowdoc={setShowDoc}
+          Chats={chats}
+          activeChatId={activeId}
+          onChatsChange={(next: ChatItem[]) => setChats(next)}
+        />
+        <Chatsection chatId={activeId} showdoc={showDoc} setshowdoc={setShowDoc} />
       </div>
     </div>
   )

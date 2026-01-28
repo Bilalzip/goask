@@ -9,9 +9,13 @@ import { getEmbeddings } from "./embeddings";
 import { convertToAscii } from "./utils";
 import { downloadFromS3 } from "./s3-service";
 
+const pineconeApiKey = process.env.PINECONE_API_KEY;
+if (!pineconeApiKey) {
+  throw new Error('Missing PINECONE_API_KEY');
+}
 const pc = new Pinecone({
-    apiKey: "3ebfa91c-77f7-4bd7-881b-a677175105bd"
-  });
+  apiKey: pineconeApiKey,
+});
 
 type PDFPage = {
   pageContent: string;
@@ -49,7 +53,9 @@ export async function loadS3IntoPinecone(fileKey: string) {
 async function embedDocument(doc: Document) {
   try {
     const embeddings = await getEmbeddings(doc.pageContent);
-    console.log(embeddings)
+    // console.log(embeddings)
+    console.log("embedding dimension:", embeddings.length);
+
     const hash = md5(doc.pageContent);
     return {
       id: hash,
